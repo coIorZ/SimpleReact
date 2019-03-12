@@ -6,9 +6,22 @@ const Footer = ({ children }) => (
   </div>
 );
 
-class Counter {
+class Counter extends SimpleReact.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      count: 0
+    }
+  }
+
   render() {
-    return <button onClick={() => alert("hi")}>button</button>;
+    const {count} = this.state;
+    return (
+      <div>
+        <button onClick={() => {this.setState({count: count + 1})}}>add</button>
+        <span style="margin-left:10px;">{count}</span>
+      </div>
+    )
   }
 }
 

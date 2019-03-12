@@ -26,7 +26,9 @@ export default function createInstance(element) {
       const processedProps = getFirstChild(props);
       const componentInstance = new type(processedProps);
       const el = componentInstance.render();
-      return createInstance(el);
+      const instance = createInstance(el);
+      componentInstance._internalInstance = instance;
+      return instance;
     }
   }
   updateNode(dom, props);

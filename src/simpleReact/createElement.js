@@ -5,7 +5,7 @@ export default function createElement(type, config, ...args) {
   props.children = args.length
     ? args
         .filter(a => a != null && a !== false)
-        .map(a => (typeof a === "string" ? createTextElement(a) : a))
+        .map(a => (isTextElement(a) ? createTextElement(a) : a))
     : [];
   let $$type = SR_ELEMENT.NODE;
   if (typeof type === "function") {
@@ -16,6 +16,10 @@ export default function createElement(type, config, ...args) {
     }
   }
   return { $$type, type, props };
+}
+
+function isTextElement(arg) {
+  return typeof arg === 'string' || typeof arg === 'number';
 }
 
 function createTextElement(str) {

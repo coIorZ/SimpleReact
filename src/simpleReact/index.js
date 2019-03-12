@@ -1,5 +1,6 @@
 import createElement from "./createElement";
 import createInstance from "./createInstance";
+import Component from './component'
 
 function render(element, container) {
   const instance = createInstance(element);
@@ -9,7 +10,8 @@ function render(element, container) {
 
 const React = {
   createElement,
-  render
+  render,
+  Component
 };
 
 export default React;
