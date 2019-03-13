@@ -1,3 +1,5 @@
+import reconcile from "./reconcile";
+
 class Component {
   constructor(props) {
     this.props = props;
@@ -9,7 +11,8 @@ class Component {
   }
 
   setState(partialState) {
-    this.state = {...this.state, ...partialState};
+    this.state = { ...this.state, ...partialState };
+    this._internalInstance = reconcile(this.render(), this._internalInstance);
   }
 }
 
