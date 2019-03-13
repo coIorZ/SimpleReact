@@ -20,14 +20,16 @@ export default function createInstance(element) {
     case SR_ELEMENT.FUNCTION: {
       const processedProps = getFirstChild(props);
       const el = type(processedProps);
-      return createInstance(el);
+      const child = createInstance(el);
+      return {element, dom: child.dom, child};
     }
     case SR_ELEMENT.CLASS: {
       const processedProps = getFirstChild(props);
-      const componentInstance = new type(processedProps);
-      const el = componentInstance.render();
-      const instance = createInstance(el);
-      componentInstance._internalInstance = instance;
+      const publicInstance = new type(processedProps);
+      const el = publicInstance.render();
+      const child = createInstance(el);
+      const instance = { element, dom: child.dom, child, publicInstance };
+      publicInstance._internalInstance = instance;
       return instance;
     }
   }

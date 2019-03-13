@@ -3,8 +3,7 @@ import reconcile from "./reconcile";
 import Component from "./component";
 
 function render(element, container) {
-  const instance = reconcile(element);
-  container.appendChild(instance.dom);
+  reconcile(element, null, container);
 }
 
 const React = {

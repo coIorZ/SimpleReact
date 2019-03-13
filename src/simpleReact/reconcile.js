@@ -1,29 +1,65 @@
+import {SR_ELEMENT} from './constants'
 import { updateNode } from "./dom";
 import createInstance from "./createInstance";
 
-export default function reconcile(newElement, currentInstance) {
-  if (!currentInstance) {
-    return createInstance(newElement);
-  }
+export default function reconcile(newElement, currentInstance, parentNode) {
   let newInstance;
-  const { element, dom, children } = currentInstance;
+  if (!currentInstance) {
+    // add
+    newInstance = createInstance(newElement);
+    parentNode.appendChild(newInstance.dom);
+    applyLifeCycle(newInstance, 'componentDidMount');
+    return newInstance;
+  } 
+  const { element, dom, children, publicInstance, child } = currentInstance;
   if (!newElement) {
-    newInstance = null;
-    dom.parentNode.removeChild(dom);
-  } else {
-    if (element.type && element.type !== newElement.type) {
-      newInstance = createInstance(newElement);
-      dom.parentNode.replaceChild(newInstance.dom, dom);
-    } else {
+    // remove
+    applyLifeCycle(currentInstance, 'componentWillUnmount');
+    parentNode.removeChild(dom);
+    return null;
+  } 
+  // update
+  switch(newElement.$$type) {
+    case SR_ELEMENT.TEXT: {
       updateNode(dom, newElement.props, element.props);
-      newInstance = { dom, element: newElement, children: [] };
-      newElement.props.children.forEach((newEl, index) => {
-        const newInst = reconcile(newEl, children[index]);
-        if (newInst) {
-          newInstance.children.push(newInst);
-        }
-      });
+      currentInstance.element = newElement;
+      return currentInstance;
+    }
+    case SR_ELEMENT.NODE: {
+      if(element.type !== newElement.type) {
+        newInstance = createInstance(newElement);
+        parentNode.replaceChild(newInstance.dom, dom);
+        return newInstance;
+      } else {
+        updateNode(dom, newElement.props, element.props);
+        currentInstance.element = newElement;
+        const len = Math.max(newElement.props.children.length, children.length);
+        currentInstance.children = Array.from({ length: len })
+          .map((_, i) =>
+            reconcile(newElement.props.children[i], children[i], dom)
+          )
+          .filter(inst => inst != null);
+        return currentInstance;
+      }
+    }
+    case SR_ELEMENT.FUNCTION: {
+      const el = newElement.type(newElement.props);
+      const inst = reconcile(el, child, dom);
+      currentInstance.child = inst;
+      return currentInstance;
+    }
+    case SR_ELEMENT.CLASS: {
+      publicInstance.props = {...publicInstance.props, ...newElement.props};
+      const el = publicInstance.render();
+      const inst = reconcile(el, child, dom);
+      currentInstance.child = inst;
+      return currentInstance;
     }
   }
-  return newInstance;
+}
+
+function applyLifeCycle(instance, name, a, b) {
+  if(instance.element.$$type === SR_ELEMENT.CLASS) {
+    instance.publicInstance[name](a, b);
+  }
 }

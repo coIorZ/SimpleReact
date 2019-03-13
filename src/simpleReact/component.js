@@ -12,8 +12,16 @@ class Component {
 
   setState(partialState) {
     this.state = { ...this.state, ...partialState };
-    this._internalInstance = reconcile(this.render(), this._internalInstance);
+    this._internalInstance = updateInstance(this._internalInstance);
   }
+
+  componentDidMount() {}
+  componentDidUpdate() {}
+  componentWillUnmount() {}
+}
+
+function updateInstance(instance) {
+  return reconcile(instance.element, instance, instance.dom.parentNode);
 }
 
 export default Component;

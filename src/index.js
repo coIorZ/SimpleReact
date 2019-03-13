@@ -1,8 +1,8 @@
 import SimpleReact from "./simpleReact";
 
-const Footer = ({ label, onClick }) => (
+const Footer = ({ label }) => (
   <div style="margin-top:50px;">
-    {label ? <span>{label}</span> : <button onClick={onClick}>show</button>}
+    <span>{label}</span>
   </div>
 );
 
@@ -15,6 +15,7 @@ class Counter extends SimpleReact.Component {
   }
 
   render() {
+    const { label } = this.props;
     const { count } = this.state;
     return (
       <div>
@@ -23,7 +24,7 @@ class Counter extends SimpleReact.Component {
             this.setState({ count: count + 1 });
           }}
         >
-          add
+          {label}
         </button>
         <span style="margin-left:10px;">{count}</span>
       </div>
@@ -35,22 +36,25 @@ class App extends SimpleReact.Component {
   constructor(props) {
     super(props);
     this.state = {
-      footerLabel: ""
+      footerLabel: "",
+      counterLabel: "add",
     };
   }
 
+  componentDidMount() {
+    setTimeout(() => {
+      this.setState({ footerLabel: "by SimpleReact" });
+    }, 2000);
+  }
+
   render() {
-    const { footerLabel } = this.state;
+    const { footerLabel, counterLabel } = this.state;
     return (
       <div>
         <h1>Hello World</h1>
-        <Counter />
-        <Footer
-          label={footerLabel}
-          onClick={() => {
-            this.setState({ footerLabel: "by SimpleReact" });
-          }}
-        />
+        <Counter label={counterLabel} />
+        <button onClick={() => {this.setState({counterLabel: 'add 1'})}}>change</button>
+        <Footer label={footerLabel} />
       </div>
     );
   }
