@@ -105,6 +105,7 @@ function reconcileChildren(newElement, currentInstance) {
       ret.push(newInst);
     }
   }
+  reorderChildren(ret, dom);
   return ret;
 }
 
@@ -127,4 +128,13 @@ function getCommonKeys(elements, instances) {
 
 function getInstanceByKey(instances, key) {
   return instances.find(inst => inst.element.key === key);
+}
+
+function reorderChildren(instances, parentNode) {
+  const nodes = parentNode.children;
+  instances.forEach((inst, i) => {
+    if (inst.element.$$type !== SR_ELEMENT.TEXT && inst.dom !== nodes[i]) {
+      parentNode.insertBefore(inst.dom, nodes[i + 1]);
+    }
+  });
 }
