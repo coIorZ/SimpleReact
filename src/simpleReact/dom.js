@@ -15,13 +15,21 @@ export function updateNode(node, props, prevProps = {}) {
       node.removeEventListener(eventName, handler);
     });
     handleAttrs(prevProps, attr => {
-      node.removeAttribute(attr);
+      if (attr === "value") {
+        node.value = "";
+      } else {
+        node.removeAttribute(attr);
+      }
     });
     handleListeners(props, (eventName, handler) => {
       node.addEventListener(eventName, handler);
     });
     handleAttrs(props, attr => {
-      node.setAttribute(attr, props[attr]);
+      if (attr === "value") {
+        node.value = props[attr];
+      } else {
+        node.setAttribute(attr, props[attr]);
+      }
     });
   }
 }

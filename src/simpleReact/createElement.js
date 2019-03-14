@@ -1,7 +1,10 @@
 import { SR_ELEMENT } from "./constants";
 
 export default function createElement(type, config, ...args) {
-  const props = { ...config };
+  const { key, ...props } = config || {};
+  if (Array.isArray(args[0])) {
+    args = args[0];
+  }
   props.children = args.length
     ? args
         .filter(a => a != null && a !== false)
@@ -15,11 +18,11 @@ export default function createElement(type, config, ...args) {
       $$type = SR_ELEMENT.FUNCTION;
     }
   }
-  return { $$type, type, props };
+  return { $$type, key, type, props };
 }
 
 function isTextElement(arg) {
-  return typeof arg === 'string' || typeof arg === 'number';
+  return typeof arg === "string" || typeof arg === "number";
 }
 
 function createTextElement(str) {

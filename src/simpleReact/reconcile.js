@@ -11,7 +11,7 @@ export default function reconcile(newElement, currentInstance, parentNode) {
     applyLifeCycle(newInstance, "componentDidMount");
     return newInstance;
   }
-  const { element, dom, children, publicInstance, child } = currentInstance;
+  const { element, dom, publicInstance, child } = currentInstance;
   if (!newElement) {
     // remove
     applyLifeCycle(currentInstance, "componentWillUnmount");
@@ -33,12 +33,10 @@ export default function reconcile(newElement, currentInstance, parentNode) {
       } else {
         updateNode(dom, newElement.props, element.props);
         currentInstance.element = newElement;
-        const len = Math.max(newElement.props.children.length, children.length);
-        currentInstance.children = Array.from({ length: len })
-          .map((_, i) =>
-            reconcile(newElement.props.children[i], children[i], dom)
-          )
-          .filter(inst => inst != null);
+        currentInstance.children = reconcileChildren(
+          newElement,
+          currentInstance
+        );
         return currentInstance;
       }
     }
@@ -74,4 +72,54 @@ function applyLifeCycle(instance, name, a, b) {
   if (instance.element.$$type === SR_ELEMENT.CLASS) {
     instance.publicInstance[name](a, b);
   }
+}
+
+function reconcileChildren(newElement, currentInstance) {
+  const ret = [];
+  const elementChildren = newElement.props.children;
+  const { children: instanceChildren, dom } = currentInstance;
+  const commonKeys = getCommonKeys(elementChildren, instanceChildren);
+  const noKeyInstances = instanceChildren.filter(
+    inst => !commonKeys[inst.element.key]
+  );
+  const len = Math.max(elementChildren.length, instanceChildren.length);
+  for (let i = 0, j = 0; i < len; i++) {
+    let newInst;
+    const element = elementChildren[i];
+    if (element && commonKeys[element.key]) {
+      newInst = reconcile(
+        element,
+        getInstanceByKey(instanceChildren, element.key),
+        dom
+      );
+    } else {
+      newInst = reconcile(element, noKeyInstances[j], dom);
+      j++;
+    }
+    if (newInst) {
+      ret.push(newInst);
+    }
+  }
+  return ret;
+}
+
+function getCommonKeys(elements, instances) {
+  const commonKeys = {};
+  elements.forEach(el => {
+    const key = el.key;
+    if (key != null) {
+      commonKeys[key] = false;
+    }
+  });
+  instances.forEach(inst => {
+    const key = inst.element.key;
+    if (key != null && commonKeys[key] === false) {
+      commonKeys[key] = true;
+    }
+  });
+  return commonKeys;
+}
+
+function getInstanceByKey(instances, key) {
+  return instances.find(inst => inst.element.key === key);
 }
