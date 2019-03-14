@@ -53,6 +53,20 @@ class TodoList extends SimpleReact.Component {
       term: ""
     };
     this._guid = 0;
+    console.log("constructor", props);
+  }
+
+  componentDidMount() {
+    console.log("componentDidMount");
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    console.log(
+      "componentDidUpdate",
+      prevProps,
+      prevState,
+      this._internalInstance
+    );
   }
 
   render() {
@@ -86,6 +100,7 @@ class TodoList extends SimpleReact.Component {
               }}
             />
           ))}
+          <li>todo</li>
         </ul>
       </div>
     );

@@ -18,14 +18,14 @@ export default function createInstance(element) {
       break;
     }
     case SR_ELEMENT.FUNCTION: {
-      const processedProps = getFirstChild(props);
-      const el = type(processedProps);
+      checkIfSingleChild(props);
+      const el = type(props);
       const child = createInstance(el);
-      return {element, dom: child.dom, child};
+      return { element, dom: child.dom, child };
     }
     case SR_ELEMENT.CLASS: {
-      const processedProps = getFirstChild(props);
-      const publicInstance = new type(processedProps);
+      checkIfSingleChild(props);
+      const publicInstance = new type(props);
       const el = publicInstance.render();
       const child = createInstance(el);
       const instance = { element, dom: child.dom, child, publicInstance };
@@ -43,9 +43,8 @@ export default function createInstance(element) {
   return { element, dom, children: instanceChildren };
 }
 
-function getFirstChild(props) {
+function checkIfSingleChild(props) {
   if (props.children.length > 1) {
     throw new Error("Component Children length must be 1!");
   }
-  return { ...props, children: props.children[0] };
 }

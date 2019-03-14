@@ -18,6 +18,11 @@ export default function reconcile(newElement, currentInstance, parentNode) {
     parentNode.removeChild(dom);
     return null;
   }
+  if (newElement.$$type !== currentInstance.element.$$type) {
+    newInstance = createInstance(newElement);
+    parentNode.replaceChild(newInstance.dom, dom);
+    return newInstance;
+  }
   // update
   switch (newElement.$$type) {
     case SR_ELEMENT.TEXT: {
