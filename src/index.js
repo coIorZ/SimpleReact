@@ -37,7 +37,7 @@ class App extends SimpleReact.Component {
     super(props);
     this.state = {
       footerLabel: "",
-      counterLabel: "add",
+      counterLabel: "add"
     };
   }
 
@@ -53,7 +53,13 @@ class App extends SimpleReact.Component {
       <div>
         <h1>Hello World</h1>
         <Counter label={counterLabel} />
-        <button onClick={() => {this.setState({counterLabel: 'add 1'})}}>change</button>
+        <button
+          onClick={() => {
+            this.setState({ counterLabel: "add 1" });
+          }}
+        >
+          change
+        </button>
         <Footer label={footerLabel} />
       </div>
     );
