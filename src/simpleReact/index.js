@@ -1,6 +1,6 @@
-import createElement from "./createElement";
-import reconcile from "./reconcile";
-import Component from "./component";
+import createElement from './createElement';
+import reconcile from './reconcile';
+import Component from './component';
 
 function render(element, container) {
   reconcile(element, null, container);
@@ -9,7 +9,7 @@ function render(element, container) {
 const React = {
   createElement,
   render,
-  Component
+  Component,
 };
 
 export default React;

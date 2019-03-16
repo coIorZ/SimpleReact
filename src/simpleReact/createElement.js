@@ -1,4 +1,4 @@
-import { SR_ELEMENT } from "./constants";
+import { SR_ELEMENT } from './constants';
 
 export default function createElement(type, config, ...args) {
   const { key, ...props } = config || {};
@@ -9,7 +9,7 @@ export default function createElement(type, config, ...args) {
         .map(a => (isTextElement(a) ? createTextElement(a) : a))
     : [];
   let $$type = SR_ELEMENT.NODE;
-  if (typeof type === "function") {
+  if (typeof type === 'function') {
     if (type.prototype && type.prototype.render) {
       $$type = SR_ELEMENT.CLASS;
     } else {
@@ -22,7 +22,7 @@ export default function createElement(type, config, ...args) {
 function flatten(args) {}
 
 function isTextElement(arg) {
-  return typeof arg === "string" || typeof arg === "number";
+  return typeof arg === 'string' || typeof arg === 'number';
 }
 
 function createTextElement(str) {

@@ -1,16 +1,16 @@
 import {
   createTextNodeFromString,
   createDomElementFromType,
-  updateNode
-} from "./dom";
-import { SR_ELEMENT } from "./constants";
+  updateNode,
+} from './dom';
+import { SR_ELEMENT } from './constants';
 
 export default function createInstance(element) {
   const { $$type, type, props } = element;
   let dom;
   switch ($$type) {
     case SR_ELEMENT.TEXT: {
-      dom = createTextNodeFromString("");
+      dom = createTextNodeFromString('');
       break;
     }
     case SR_ELEMENT.NODE: {
@@ -25,11 +25,11 @@ export default function createInstance(element) {
     }
     case SR_ELEMENT.CLASS: {
       checkIfSingleChild(props);
-      const publicInstance = new type(props);
-      const el = publicInstance.render();
+      const componentInstance = new type(props);
+      const el = componentInstance.render();
       const child = createInstance(el);
-      const instance = { element, dom: child.dom, child, publicInstance };
-      publicInstance._internalInstance = instance;
+      const instance = { element, dom: child.dom, child, componentInstance };
+      componentInstance._internalInstance = instance;
       return instance;
     }
   }
@@ -45,6 +45,6 @@ export default function createInstance(element) {
 
 function checkIfSingleChild(props) {
   if (props.children.length > 1) {
-    throw new Error("Component Children length must be 1!");
+    throw new Error('Component Children length must be 1!');
   }
 }

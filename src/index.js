@@ -1,4 +1,4 @@
-import SimpleReact from "./simpleReact";
+import SimpleReact from './simpleReact';
 
 const Section = ({ children }) => (
   <div style="margin-top:20px;margin-bottom:20px;">{children}</div>
@@ -14,8 +14,17 @@ class Counter extends SimpleReact.Component {
   constructor(props) {
     super(props);
     this.state = {
-      count: 0
+      count: 0,
     };
+    console.log('Counter constructor');
+  }
+
+  componentDidMount() {
+    console.log('Counter componentDidMount');
+  }
+
+  componentDidUpdate() {
+    console.log('Counter componentDidUpdate');
   }
 
   render() {
@@ -50,23 +59,18 @@ class TodoList extends SimpleReact.Component {
     super(props);
     this.state = {
       todos: [],
-      term: ""
+      term: '',
     };
     this._guid = 0;
-    console.log("constructor", props);
+    console.log('Todolist constructor');
   }
 
   componentDidMount() {
-    console.log("componentDidMount");
+    console.log('Todolist componentDidMount');
   }
 
   componentDidUpdate(prevProps, prevState) {
-    console.log(
-      "componentDidUpdate",
-      prevProps,
-      prevState,
-      this._internalInstance
-    );
+    console.log('Todolist componentDidUpdate');
   }
 
   render() {
@@ -84,7 +88,7 @@ class TodoList extends SimpleReact.Component {
         <button
           onClick={() => {
             const newTodos = todos.concat({ key: this._guid++, text: term });
-            this.setState({ todos: newTodos, term: "" });
+            this.setState({ todos: newTodos, term: '' });
           }}
         >
           submit
@@ -111,15 +115,21 @@ class App extends SimpleReact.Component {
   constructor(props) {
     super(props);
     this.state = {
-      footerLabel: "by SimpleReact",
-      counterLabel: "add"
+      footerLabel: 'by SimpleReact',
+      counterLabel: 'add',
     };
+    console.log('App constructor');
   }
 
   componentDidMount() {
+    console.log('App componentDidMount');
     setTimeout(() => {
-      this.setState({ counterLabel: "add 1" });
+      this.setState({ counterLabel: 'add 1' });
     }, 2000);
+  }
+
+  componentDidUpdate() {
+    console.log('App componentDidUpdate');
   }
 
   render() {
@@ -138,4 +148,4 @@ class App extends SimpleReact.Component {
   }
 }
 
-SimpleReact.render(<App />, document.querySelector("#app"));
+SimpleReact.render(<App />, document.querySelector('#app'));

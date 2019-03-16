@@ -1,4 +1,4 @@
-import reconcile from "./reconcile";
+import reconcile from './reconcile';
 
 class Component {
   constructor(props) {

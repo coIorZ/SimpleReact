@@ -15,8 +15,8 @@ export function updateNode(node, props, prevProps = {}) {
       node.removeEventListener(eventName, handler);
     });
     handleAttrs(prevProps, attr => {
-      if (attr === "value") {
-        node.value = "";
+      if (attr === 'value') {
+        node.value = '';
       } else {
         node.removeAttribute(attr);
       }
@@ -25,7 +25,7 @@ export function updateNode(node, props, prevProps = {}) {
       node.addEventListener(eventName, handler);
     });
     handleAttrs(props, attr => {
-      if (attr === "value") {
+      if (attr === 'value') {
         node.value = props[attr];
       } else {
         node.setAttribute(attr, props[attr]);
@@ -44,11 +44,11 @@ function handleListeners(props, cb) {
 
 function handleAttrs(props, cb) {
   const attrs = Object.keys(props).filter(
-    p => !isListener(p) && p !== "children"
+    p => !isListener(p) && p !== 'children'
   );
   attrs.forEach(cb);
 }
 
 function isListener(str) {
-  return str.startsWith("on");
+  return str.startsWith('on');
 }

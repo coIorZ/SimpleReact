@@ -1,6 +1,6 @@
-import { SR_ELEMENT } from "./constants";
-import { updateNode } from "./dom";
-import createInstance from "./createInstance";
+import { SR_ELEMENT } from './constants';
+import { updateNode } from './dom';
+import createInstance from './createInstance';
 
 export default function reconcile(newElement, currentInstance, parentNode) {
   let newInstance;
@@ -8,13 +8,11 @@ export default function reconcile(newElement, currentInstance, parentNode) {
     // add
     newInstance = createInstance(newElement);
     parentNode.appendChild(newInstance.dom);
-    applyLifeCycle(newInstance, "componentDidMount");
     return newInstance;
   }
-  const { element, dom, publicInstance, child } = currentInstance;
+  const { element, dom, componentInstance, child } = currentInstance;
   if (!newElement) {
     // remove
-    applyLifeCycle(currentInstance, "componentWillUnmount");
     parentNode.removeChild(dom);
     return null;
   }
@@ -53,29 +51,20 @@ export default function reconcile(newElement, currentInstance, parentNode) {
       return currentInstance;
     }
     case SR_ELEMENT.CLASS: {
-      const prevProps = publicInstance.props;
-      const prevState = publicInstance.state;
-      publicInstance.props = { ...prevProps, ...newElement.props };
-      publicInstance.state = { ...prevState, ...publicInstance._queueState };
-      publicInstance._queueState = null;
-      const el = publicInstance.render();
+      const prevProps = componentInstance.props;
+      const prevState = componentInstance.state;
+      componentInstance.props = { ...prevProps, ...newElement.props };
+      componentInstance.state = {
+        ...prevState,
+        ...componentInstance._queueState,
+      };
+      componentInstance._queueState = null;
+      const el = componentInstance.render();
       const inst = reconcile(el, child, dom);
       currentInstance.child = inst;
       currentInstance.element = newElement;
-      applyLifeCycle(
-        currentInstance,
-        "componentDidUpdate",
-        prevProps,
-        prevState
-      );
       return currentInstance;
     }
-  }
-}
-
-function applyLifeCycle(instance, name, a, b) {
-  if (instance.element.$$type === SR_ELEMENT.CLASS) {
-    instance.publicInstance[name](a, b);
   }
 }
 
