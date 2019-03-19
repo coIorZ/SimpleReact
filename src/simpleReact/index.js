@@ -1,10 +1,6 @@
 import createElement from './createElement';
-import reconcile from './reconcile';
-import Component from './component';
-
-function render(element, container) {
-  reconcile(element, null, container);
-}
+import Component from './Component';
+import { render } from './updater';
 
 const React = {
   createElement,

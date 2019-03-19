@@ -2,11 +2,16 @@ import { SR_ELEMENT } from './constants';
 import { updateNode } from './dom';
 import createInstance from './createInstance';
 
-export default function reconcile(newElement, currentInstance, parentNode) {
+export default function reconcile(
+  newElement,
+  currentInstance,
+  parentNode,
+  transaction
+) {
   let newInstance;
   if (!currentInstance) {
     // add
-    newInstance = createInstance(newElement);
+    newInstance = createInstance(newElement, transaction);
     parentNode.appendChild(newInstance.dom);
     return newInstance;
   }
@@ -17,7 +22,7 @@ export default function reconcile(newElement, currentInstance, parentNode) {
     return null;
   }
   if (newElement.$$type !== currentInstance.element.$$type) {
-    newInstance = createInstance(newElement);
+    newInstance = createInstance(newElement, transaction);
     parentNode.replaceChild(newInstance.dom, dom);
     return newInstance;
   }
@@ -30,7 +35,7 @@ export default function reconcile(newElement, currentInstance, parentNode) {
     }
     case SR_ELEMENT.NODE: {
       if (element.type !== newElement.type) {
-        newInstance = createInstance(newElement);
+        newInstance = createInstance(newElement, transaction);
         parentNode.replaceChild(newInstance.dom, dom);
         return newInstance;
       } else {
@@ -38,14 +43,15 @@ export default function reconcile(newElement, currentInstance, parentNode) {
         currentInstance.element = newElement;
         currentInstance.children = reconcileChildren(
           newElement,
-          currentInstance
+          currentInstance,
+          transaction
         );
         return currentInstance;
       }
     }
     case SR_ELEMENT.FUNCTION: {
       const el = newElement.type(newElement.props);
-      const inst = reconcile(el, child, dom);
+      const inst = reconcile(el, child, dom, transaction);
       currentInstance.child = inst;
       currentInstance.element = newElement;
       return currentInstance;
@@ -53,22 +59,37 @@ export default function reconcile(newElement, currentInstance, parentNode) {
     case SR_ELEMENT.CLASS: {
       const prevProps = componentInstance.props;
       const prevState = componentInstance.state;
-      componentInstance.props = { ...prevProps, ...newElement.props };
-      componentInstance.state = {
-        ...prevState,
-        ...componentInstance._queueState,
-      };
-      componentInstance._queueState = null;
-      const el = componentInstance.render();
-      const inst = reconcile(el, child, dom);
-      currentInstance.child = inst;
+      const nextProps = { ...prevProps, ...newElement.props };
+      const nextState = componentInstance._pendingState.reduce(
+        (ret, state) => ({
+          ...ret,
+          ...state,
+        }),
+        prevState
+      );
+      if (componentInstance.shouldComponentUpdate(nextProps, nextState)) {
+        componentInstance.props = nextProps;
+        componentInstance.state = nextState;
+        const el = componentInstance.render();
+        const inst = reconcile(el, child, dom, transaction);
+        currentInstance.child = inst;
+        transaction.lifeCycleQueue.enqueue(
+          componentInstance,
+          'componentDidUpdate',
+          prevProps,
+          prevState
+        );
+      }
+      componentInstance.props = nextProps;
+      componentInstance.state = nextState;
+      componentInstance._pendingState.length = 0;
       currentInstance.element = newElement;
       return currentInstance;
     }
   }
 }
 
-function reconcileChildren(newElement, currentInstance) {
+function reconcileChildren(newElement, currentInstance, transaction) {
   const ret = [];
   const elementChildren = newElement.props.children;
   const { children: instanceChildren, dom } = currentInstance;
@@ -84,10 +105,11 @@ function reconcileChildren(newElement, currentInstance) {
       newInst = reconcile(
         element,
         getInstanceByKey(instanceChildren, element.key),
-        dom
+        dom,
+        transaction
       );
     } else {
-      newInst = reconcile(element, noKeyInstances[j], dom);
+      newInst = reconcile(element, noKeyInstances[j], dom, transaction);
       j++;
     }
     if (newInst) {

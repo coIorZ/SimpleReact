@@ -19,8 +19,6 @@ export default function createElement(type, config, ...args) {
   return { $$type, key, type, props };
 }
 
-function flatten(args) {}
-
 function isTextElement(arg) {
   return typeof arg === 'string' || typeof arg === 'number';
 }

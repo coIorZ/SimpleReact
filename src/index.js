@@ -19,12 +19,22 @@ class Counter extends SimpleReact.Component {
     console.log('Counter constructor');
   }
 
+  componentWillMount() {
+    console.log('Counter componentWillMount');
+  }
+
   componentDidMount() {
+    console.log('>>> didmount count', this.state.count);
+    this.setState({ count: 1 });
+    console.log('>>> didmount count', this.state.count);
+    this.setState({ count: 2 });
+    console.log('>>> didmount count', this.state.count);
     console.log('Counter componentDidMount');
   }
 
   componentDidUpdate() {
     console.log('Counter componentDidUpdate');
+    console.log('>>> didupdate count', this.state.count);
   }
 
   render() {
@@ -65,6 +75,10 @@ class TodoList extends SimpleReact.Component {
     console.log('Todolist constructor');
   }
 
+  componentWillMount() {
+    console.log('Todolist componentWillMount');
+  }
+
   componentDidMount() {
     console.log('Todolist componentDidMount');
   }
@@ -81,7 +95,6 @@ class TodoList extends SimpleReact.Component {
           type="text"
           value={term}
           onChange={e => {
-            e.preventDefault();
             this.setState({ term: e.target.value });
           }}
         />
@@ -119,6 +132,10 @@ class App extends SimpleReact.Component {
       counterLabel: 'add',
     };
     console.log('App constructor');
+  }
+
+  componentWillMount() {
+    console.log('App componentWillMount');
   }
 
   componentDidMount() {
