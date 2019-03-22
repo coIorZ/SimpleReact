@@ -1,4 +1,4 @@
-import { batchUpdate } from './updater';
+import { enqueueUpdate } from './updater';
 import reconcile from './reconcile';
 
 class Component {
@@ -13,7 +13,7 @@ class Component {
   }
 
   setState(partialState) {
-    batchUpdate(this, partialState);
+    enqueueUpdate(this, partialState);
   }
 
   _performUpdate(transaction) {

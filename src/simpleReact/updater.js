@@ -1,58 +1,30 @@
-import transactionify from './transactionify';
-import CallbackQueue from './CallbackQueue';
 import reconcile from './reconcile';
+import reconcileTransaction from './reconcileTransaction';
+import batchStrategyTransaction from './batchStrategyTransaction';
+import batchUpdate from './batchUpdate';
 
-let isBatchUpdating = false;
-const dirtyComponent = [];
-const noop = function() {};
-const lifeCycleQueue = new CallbackQueue();
-
-const lifeCycleAction = {
-  initialize: () => {
-    lifeCycleQueue.reset();
-  },
-  close: () => {
-    lifeCycleQueue.notifyAll();
-  },
+const mountElementIntoNode = (element, container) => {
+  return reconcileTransaction.perform(
+    reconcile,
+    element,
+    null,
+    container,
+    reconcileTransaction
+  );
 };
-
-const batchUpdateAction = {
-  initialize: noop,
-  close: () => {
-    isBatchUpdating = false;
-  },
-};
-
-const flushAction = {
-  initialize: noop,
-  close: () => {
-    while (dirtyComponent.length) {
-      const component = dirtyComponent.shift();
-      component._performUpdate(transaction);
-    }
-  },
-};
-
-const transaction = Object.assign(
-  {},
-  transactionify([lifeCycleAction, flushAction, batchUpdateAction]),
-  {
-    lifeCycleQueue,
-  }
-);
 
 const render = (element, container) => {
-  isBatchUpdating = true;
-  return transaction.perform(reconcile, element, null, container, transaction);
+  return batchUpdate(mountElementIntoNode, element, container);
 };
 
-const batchUpdate = (component, partialState) => {
+const enqueueUpdate = (component, partialState) => {
+  if (!batchStrategyTransaction.isBatchUpdating) {
+    return batchUpdate(enqueueUpdate, component, partialState);
+  }
   component._pendingState.push(partialState);
-  if (!isBatchUpdating) {
-    component._performUpdate(transaction);
-  } else if (dirtyComponent.indexOf(component) === -1) {
-    dirtyComponent.push(component);
+  if (batchStrategyTransaction.dirtyComponents.indexOf(component) === -1) {
+    batchStrategyTransaction.dirtyComponents.push(component);
   }
 };
 
-export { render, batchUpdate };
+export { render, enqueueUpdate };
