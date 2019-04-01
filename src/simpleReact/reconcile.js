@@ -18,13 +18,18 @@ export default function reconcile(
   const { element, dom, componentInstance, child } = currentInstance;
   if (!newElement) {
     // remove
+    if (componentInstance) {
+      componentInstance.componentWillUnmount();
+    }
     parentNode.removeChild(dom);
     return null;
   }
-  if (newElement.$$type !== currentInstance.element.$$type) {
-    newInstance = createInstance(newElement, transaction);
-    parentNode.replaceChild(newInstance.dom, dom);
-    return newInstance;
+  if (
+    newElement.key !== currentInstance.element.key ||
+    newElement.$$type !== currentInstance.element.$$type
+  ) {
+    reconcile(null, currentInstance, parentNode, transaction);
+    return reconcile(newElement, null, parentNode, transaction);
   }
   // update
   switch (newElement.$$type) {
