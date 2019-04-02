@@ -124,6 +124,58 @@ class TodoList extends SimpleReact.Component {
   }
 }
 
+class KeyChild extends SimpleReact.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      name: props.name,
+    };
+    console.log('KeyChild constructor');
+  }
+
+  componentDidMount() {
+    console.log('KeyChild componentDidMount');
+  }
+
+  componentDidUpdate() {
+    console.log('KeyChild componentDidUpdate');
+  }
+
+  componentWillUnmount() {
+    console.log('KeyChild componentWillUnmount');
+  }
+
+  render() {
+    const { name } = this.state;
+    return <div>{name}</div>;
+  }
+}
+
+class KeyParent extends SimpleReact.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      name: 'a',
+    };
+  }
+
+  render() {
+    const { name } = this.state;
+    return (
+      <div>
+        <button
+          onClick={() => {
+            this.setState({ name: 'b' });
+          }}
+        >
+          b
+        </button>
+        <KeyChild key={name} name={name} />
+      </div>
+    );
+  }
+}
+
 class App extends SimpleReact.Component {
   constructor(props) {
     super(props);
@@ -158,6 +210,9 @@ class App extends SimpleReact.Component {
         </Section>
         <Section>
           <TodoList />
+        </Section>
+        <Section>
+          <KeyParent />
         </Section>
         <Footer label={footerLabel} />
       </div>
